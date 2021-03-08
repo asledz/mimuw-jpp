@@ -1,5 +1,5 @@
 # mimuw-jpp
-Programming languages and paradigms laboratory
+Programming languages and paradigms course
 
 ## Small laboratory tasks
 
