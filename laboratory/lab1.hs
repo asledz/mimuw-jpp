@@ -144,3 +144,34 @@ positions' x (y:xs) n res =
     else 
         positions' x xs (n+1) res
 
+
+
+-- Fibonacci
+
+fib n = 
+    if (n<2) then
+        (1,1)
+    else
+        let (a, b) = fib (n-1) in
+            (b, a+b)
+
+
+fib1 a b n = 
+    if (n <= 1) then b
+    else fib1 a (a+b) (n-1)
+
+-- PRIME NUMBERS
+
+nats' n = n:(nats' (n+1))
+nats = nats' 0
+
+isPrime' k n = 
+    if (k >= n) then True
+    else
+        if (mod n k == 0) then False
+        else isPrime' (k+1) n
+
+
+isPrime n = isPrime' 2 n
+
+primes = filter isPrime nats
