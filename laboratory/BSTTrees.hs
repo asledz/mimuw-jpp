@@ -3,7 +3,8 @@ module BSTTrees (
     toList,
     insert,
     member,
-
+    fromList,
+    bstSort
 ) where
 
 data Tree a = Empty 
@@ -60,4 +61,4 @@ member a (Node b tl tr)
 fromList l = foldl (\ t a -> insert a t) Empty l
 
 
--- bstSort l = toList $ fromList l
+bstSort l = toList $ fromList l
