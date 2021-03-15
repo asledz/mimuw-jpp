@@ -1,32 +1,38 @@
+import BSTTrees
+
+-- Solved in module BSTTrees:
 -- Zadanie 1
 -- Rozważmy typ drzew trochę inny niż na wykladzie
-
 -- data Tree a = Empty 
 --             | Node a (Tree a) (Tree a) 
 -- a. stwórz własne instancje Eq, Show
-
--- instance Show a => Show (Tree a) where
---    show t = ...
-
--- instance Eq a => Eq (Tree a) where
---    t1 == t2 = ...
 -- b. Napisz funkcję
-
 --     toList :: Tree a -> [a]
 -- ktora zamieni drzewo w liste elementow drzewa (w porzadku infiksowym)
-
 -- c. zaimplementuj drzewa BST z funkcjami
-
---     insert :: (Ord a) => a -> Tree a -> Tree a
---     member :: (Ord a) -> a -> Tree a -> Bool
---     fromList :: (Ord a) => [a] -> Tree a
 -- d. Stwórz moduł drzew BST i wykorzystaj go w innym module do sortowania [Int]
 
 -- przy pomocy ghci
 -- przy pomocy ghc
 
-data Tree a = Empty 
-    | Node a (Tree a) (Tree a) 
+-- Zadanie 2
+-- Niech typ
 
-instance Show a => Show (Tree a) where
-   show t = 
+newtype OrderedList a = OL [a] deriving (Eq, Show)
+
+instance Functor OrderedList where
+    fmap f (OL l) = OL (map f l)
+
+
+-- reprezentuje listy uporządkowane niemalejąco
+
+-- a. Uzupełnij instancje
+
+-- instance Functor OrderedList where
+-- instance  Ord a => Semigroup (OrderedList a) where
+-- instance Ord a => Monoid (OrderedList a) where
+-- tak, aby zachowywały niezmiennik uporządkowania.
+
+-- b. Napisz funkcję eliminującą duplikaty (analogicznie do nub)
+
+-- nubOrdered :: Ord a => OrderedList a -> OrderedList a
