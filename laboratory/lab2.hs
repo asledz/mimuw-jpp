@@ -1,6 +1,12 @@
 import BSTTrees
 import Data.Semigroup
 import Data.Monoid
+
+import Prelude hiding(Either(..))
+
+import Data.Char (isDigit, ord)
+data Either a b = Left a | Right b
+
 -- Solved in module BSTTrees:
 -- Zadanie 1
 -- Rozważmy typ drzew trochę inny niż na wykladzie
@@ -199,15 +205,35 @@ reverseRight = mapRight reverse
 
 -- Zadanie 5
 -- a. Napisz funkcję
-
--- readInts :: String -> [Int]
 -- która odczyta z napisu występujące w nim liczby naturalne, np
-
 -- *Main> readInts "1 23 456 7.8 abc 9"
 -- [1,23,456,9]
 -- *Main> readInts "foo"
 -- []
 -- użyj funkcji isDigit z modulu Data.Char oraz funkcji map, filter, all z Prelude
+
+split input = split' input "" []
+
+split' "" accC accL = 
+    reverse( reverse accC : accL)
+
+split' (c:res) accC accL = 
+    if c /= ' ' then 
+        split' res (c:accC) accL
+    else 
+        split' res "" (reverse accC:accL)
+
+filterDigits :: [String] -> [String]
+filterDigits input = filter (all isDigit) input
+
+parseInt :: String -> Int
+parseInt = foldl (\ r d -> 10 * r + ord(d) - ord('0')) 0
+
+
+readInts :: String -> [Int]
+-- readInts string = split string 
+readInts input = map parseInt $ filterDigits $ split $ input
+
 
 -- b. Napisz podobną funkcję readInts2 :: String -> Either String [Int] która da listę liczb, jeśli wszystkie słowa jej argumentu są liczbami a komunikat o błędzie w przeciwnym przypadku
 
@@ -230,12 +256,12 @@ reverseRight = mapRight reverse
 -- import Prelude hiding(Either(..))
 -- data Either a b = Left a | Right b
 
--- instance Functor (Either e) where
---   -- fmap :: (a -> b) -> Either e a -> Either e b
--- b. skonstruuj instancje klasy Functor dla Tree
+instance Functor (Either e) where
+    fmap = mapRight
 
--- -- class  Functor f  where
--- --    fmap :: (a -> b) -> f a -> f b
+-- b. skonstruuj instancje klasy Functor dla Tree
+-- Done in other task already
+
 
 -- instance Functor Tree where...
 
