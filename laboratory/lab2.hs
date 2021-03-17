@@ -58,29 +58,97 @@ nubAcc (Just a) (h:t)
 -- Zadanie 3
 -- Rozważmy typ dla wyrażeń arytmetycznych z let:
 
--- data Exp 
---   = EInt Int             -- stała całkowita       
---   | EAdd Exp Exp         -- e1 + e2
---   | ESub Exp Exp         -- e1 - e2
---   | EMul Exp Exp         -- e1 * e2
---   | EVar String          -- zmienna
---   | ELet String Exp Exp  -- let var = e1 in e2 
+data Exp 
+  = EInt Int             -- stała całkowita       
+  | EAdd Exp Exp         -- e1 + e2
+  | ESub Exp Exp         -- e1 - e2
+  | EMul Exp Exp         -- e1 * e2
+  | EVar String          -- zmienna
+  | ELet String Exp Exp  -- let var = e1 in e2 
+    deriving Eq
 -- a. Napisz instancje Eq oraz Show dla Exp
 
+test = ELet "x" (EInt 2) (EAdd (EVar "x") (EInt 4))
+
+instance Show Exp where
+    show (EInt x) = show x
+    show (EAdd e1 e2) = "(" ++ (show e1) ++ " + " ++ (show e2) ++ ")"
+    show (ESub e1 e2) = "(" ++ (show e1) ++ " - " ++ (show e2) ++ ")"
+    show (EMul e1 e2) = "(" ++ (show e1) ++ " * " ++ (show e2) ++ ")"
+    show (EVar x) = x
+    show (ELet x e1 e2) = "[let " ++ (show (EVar x)) ++ " = " ++ (show e1) ++ " in " ++ (show e2) ++ "]"
+
+
 -- b. Napisz instancje Num dla Exp tak, żeby można było napisać
-
--- testExp2 :: Exp
--- testExp2 = (2 + 2) * 3
 -- (metody abs i signum mogą mieć wartość undefined)
-
--- c. Napisz funkcję simpl, przekształcającą wyrażenie na równoważne prostsze wyrażenie np.
-
--- 0x + 1y -> y
-
--- (nie ma tu precyzyjnej specyfikacji, należy użyć zdrowego rozsądku; uwaga na zapętlenie).
-
 -- d. Zmodyfikuj instancję Num tak aby jej metody wykonywały (niektóre) uproszczenia z poprzedniego punktu (np 0 + x = x)
 
+instance Num Exp where
+    (+) e1 e2 = simpl $ EAdd e1 e2
+    (-) e1 e2 = simpl $ ESub e1 e2
+    (*) e1 e2 = simpl $ EMul e1 e2
+    abs = undefined
+    signum = undefined
+    fromInteger n = EInt (fromIntegral n)
+
+testExp2 :: Exp
+testExp2 = (2 + 2) * 3
+testExp3 :: Exp
+testExp3 = ELet ("x") (1 + (EVar "x") * 7) ((EVar "x") * 2 + EVar "y")
+
+-- c. Napisz funkcję simpl, przekształcającą wyrażenie na równoważne prostsze wyrażenie np.
+-- 0x + 1y -> y
+-- (nie ma tu precyzyjnej specyfikacji, należy użyć zdrowego rozsądku; uwaga na zapętlenie).
+
+is0 :: Exp -> Bool 
+is1 :: Exp -> Bool 
+
+is0 (EInt 0) = True 
+is0 (EInt _) = False 
+is0 (EAdd e1 e2) = (is0 e1) && (is0 e2)
+is0 (ESub e1 e2) = ((is0 e1) && (is0 e2)) || e1 == e2
+is0 (EMul e1 e2) = (is0 e1) || (is0 e2)
+is0 (EVar x) = False 
+is0 (ELet x e1 e2) = is0 e2
+
+is1 (EInt 1) = True
+is1 (EInt _) = False
+is1 (EAdd e1 e2) = ((is0 e1) && (is1 e2)) || ((is1 e1) && (is0 e2))
+is1 (ESub e1 e2) = ((is1 e1) && (is0 e2))
+is1 (EMul e1 e2) = (is1 e1) && (is1 e2)
+is1 (EVar x) = False 
+is1 (ELet x e1 e2) = is1 e2
+
+
+simpl :: Exp -> Exp
+simpl (EInt n) = EInt n
+
+simpl (EAdd e1 e2)
+    | is0 e1 = e2
+    | is0 e2 = e1
+    | otherwise = EAdd e1 e2
+
+simpl (ESub e1 e2)
+    | is0 e1 = ESub (EInt 0) e2
+    | is0 e2 = e1
+    | otherwise = ESub e1 e2
+
+simpl (EMul e1 e2)
+    | is0 e1 = EInt 0
+    | is0 e2 = EInt 0
+    | is1 e1 = e2
+    | is1 e2 = e1
+    | otherwise = EMul e1 e2
+
+simpl (EVar x) = EVar x
+
+simpl (ELet x e1 e2) 
+    | is0 e2 = EInt 0
+    | is1 e2 = EInt 1
+    | otherwise = ELet x e1 e2
+
+
+testSimpl = simpl (1 * EVar "x" + 0 * EVar "y")
 
 
 -- Zadanie 4
@@ -96,7 +164,7 @@ nubAcc (Just a) (h:t)
 -- fromEither :: Either a a -> a
 -- oraz
 
---     reverseRight :: Either e [a] -> Either e [a]
+-- reverseRight :: Either e [a] -> Either e [a]
 
 
 
