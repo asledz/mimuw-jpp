@@ -154,18 +154,47 @@ testSimpl = simpl (1 * EVar "x" + 0 * EVar "y")
 -- Zadanie 4
 -- Napisz funkcje
 
--- elimMaybe :: c -> (a -> c) -> Maybe a -> c
--- fromMaybe :: a -> Maybe a -> a
--- mapMaybe :: (a -> b) -> Maybe a -> Maybe b
--- maybeHead :: [a] -> Maybe a
--- elimEither :: (a  -> c) -> (b -> c) -> Either a b -> c
--- mapEither :: (a1 -> a2) -> (b1 -> b2) -> Either a1 b1 -> Either a2 b2
--- mapRight ::  (b1 -> b2) -> Either a b1 -> Either a b2
--- fromEither :: Either a a -> a
--- oraz
+elimMaybe :: c -> (a -> c) -> Maybe a -> c
 
--- reverseRight :: Either e [a] -> Either e [a]
+elimMabe x f Nothing = x
+elimMaybe x f (Just a) = f a
+ 
+fromMaybe :: a -> Maybe a -> a
 
+fromMaybe a Nothing = a
+fromMaybe _ (Just a) = a
+
+mapMaybe :: (a -> b) -> Maybe a -> Maybe b
+
+mapMaybe f Nothing = Nothing 
+mapMaybe f (Just a) = Just (f a)
+
+maybeHead :: [a] -> Maybe a
+
+maybeHead [] = Nothing 
+maybeHead (h:_) = Just h
+
+elimEither :: (a  -> c) -> (b -> c) -> Either a b -> c
+
+elimEither f h (Left a) = f a
+elimEither f h (Right b) = h b
+
+mapEither :: (a1 -> a2) -> (b1 -> b2) -> Either a1 b1 -> Either a2 b2
+
+mapEither fa fb (Left a) = Left (fa a)
+mapEither fa fb (Right b) = Right (fb b)
+
+mapRight ::  (b1 -> b2) -> Either a b1 -> Either a b2
+
+mapRight = mapEither id
+
+fromEither :: Either a a -> a
+
+fromEither = elimEither id id
+
+reverseRight :: Either e [a] -> Either e [a]
+
+reverseRight = mapRight reverse
 
 
 -- Zadanie 5
