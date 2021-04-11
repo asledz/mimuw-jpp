@@ -237,6 +237,15 @@ readInts input = map parseInt $ filterDigits $ split $ input
 
 -- b. Napisz podobną funkcję readInts2 :: String -> Either String [Int] która da listę liczb, jeśli wszystkie słowa jej argumentu są liczbami a komunikat o błędzie w przeciwnym przypadku
 
+
+readInts2 :: String -> Either String [Int]
+readInts2 inp =
+    let inpSplit = words inp in
+    if all (all isDigit) inpSplit
+        then Right (map parseInt inpSplit)
+    else 
+        Left "Non digital entry!"
+
 -- Może się przydać funkcja reverseRight (albo mapRight)
 
 --     *Main> readInts2  "1 23 456 foo 9"
@@ -249,6 +258,34 @@ readInts input = map parseInt $ filterDigits $ split $ input
 -- jesli wszystkie slowa jej argumentu są liczbami da reprezentacje ich sumy
 -- wpp komunikat o bledzie
 -- stwórz program uruchamiający funkcję sumInts przy pomocy interact.
+
+sumInts inp = 
+    case readInts2 inp of {
+        Left s -> Left s;
+        Right lista -> Right $ foldl (+) 0 lista
+    }
+    
+
+-- USING MONADS: "aksdjh 210938190 jkahsjkdh 2187381"
+
+-- data MyMaybe a = Err String | Val a -- Either String a
+
+-- instance Monad MyMaybe where
+--     return a = Val a
+--     (>>=) (Err s) f = Err s
+--     (>>=) (Val a) f = f a
+
+-- instance Applicative MyMaybe where {
+--     pure = return;
+--     m1 <*> m2 = m1 >>= (\ x1 -> m2 >>= (\ x2 -> return (x1 x2)))
+-- }
+
+-- sumInts' inp = 
+--     do
+--         ints <- readInts2 inp
+--         res <- Right (foldl (+) 0 ints)
+--         Right res
+
 
 -- Zadanie 6
 -- a.Uzupełnij instancje klasy Functor dla Either e:
@@ -271,3 +308,18 @@ instance Functor (Either e) where
 
 -- reverseRight :: Either e [a] -> Either e [a]
 -- z użyciem fmap
+
+
+dupIfEven::Int -> [Int]
+
+dupIfEven n =
+    if (even n) then [n,n]
+    else []
+
+evenizator :: [Int] -> [Int]
+
+evenizator l = 
+    do
+        v <- l
+        r <- dupIfEven v
+        return r
